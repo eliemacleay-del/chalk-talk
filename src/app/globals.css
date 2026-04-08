@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+@theme {
+  --color-mcgill: #ED1B2F;
+  --color-mcgill-dark: #C8102E;
+  --color-mcgill-light: #FF3A4F;
+  --color-surface: #111111;
+  --color-surface-light: #1A1A1A;
+  --color-border: #2A2A2A;
+  --color-border-light: #3A3A3A;
+  --color-muted: #888888;
+}

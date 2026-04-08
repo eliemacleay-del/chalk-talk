@@ -2,12 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-type Question = {
-  question: string;
-  options: string[];
-  answer: number;
-};
+import { FieldDiagram } from "@/components/FieldDiagram";
+import type { Question } from "@/lib/types";
 
 export default function QuizPage() {
   const router = useRouter();
@@ -30,12 +26,14 @@ export default function QuizPage() {
   if (questions.length === 0) {
     return (
       <main className="max-w-xl mx-auto px-6 py-20 text-center">
-        <p className="text-gray-400">Loading quiz...</p>
+        <p className="text-muted">Loading quiz...</p>
       </main>
     );
   }
 
   const q = questions[current];
+  const isCorrect = selected === q.answer;
+  const hasDiagram = q.diagram && q.diagram.players && q.diagram.players.length > 0;
 
   function handleSelect(idx: number) {
     if (answered) return;
@@ -55,23 +53,24 @@ export default function QuizPage() {
   }
 
   if (finished) {
+    const pct = score / questions.length;
     return (
       <main className="max-w-xl mx-auto px-6 py-20 text-center">
         <h1 className="text-4xl font-bold mb-4">Quiz Complete!</h1>
-        <p className="text-6xl font-extrabold text-emerald-400 mb-2">
+        <p className="text-6xl font-extrabold text-mcgill mb-2">
           {score}/{questions.length}
         </p>
-        <p className="text-gray-400 mb-8">
-          {score === questions.length
+        <p className="text-muted mb-8">
+          {pct === 1
             ? "Perfect score — you're game-day ready!"
-            : score >= questions.length / 2
+            : pct >= 0.5
               ? "Solid work. Keep studying to lock it in."
               : "Time to hit the playbook again."}
         </p>
         <div className="flex gap-4 justify-center">
           <a
             href="/upload"
-            className="px-6 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 font-medium transition-colors"
+            className="px-6 py-3 rounded-xl bg-surface hover:bg-surface-light border border-border font-medium transition-colors"
           >
             New Quiz
           </a>
@@ -83,7 +82,7 @@ export default function QuizPage() {
               setScore(0);
               setFinished(false);
             }}
-            className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-medium transition-colors"
+            className="px-6 py-3 rounded-xl bg-mcgill hover:bg-mcgill-light font-medium transition-colors"
           >
             Retry
           </button>
@@ -93,54 +92,89 @@ export default function QuizPage() {
   }
 
   return (
-    <main className="max-w-xl mx-auto px-6 py-16">
+    <main className={`mx-auto px-6 py-16 ${hasDiagram ? "max-w-4xl" : "max-w-xl"}`}>
+      {/* Progress bar */}
+      <div className="w-full h-1 bg-border rounded-full mb-8 overflow-hidden">
+        <div
+          className="h-full bg-mcgill rounded-full transition-all duration-300"
+          style={{ width: `${((current + 1) / questions.length) * 100}%` }}
+        />
+      </div>
+
       <div className="flex items-center justify-between mb-8">
-        <span className="text-sm text-gray-400">
+        <span className="text-sm text-muted">
           Question {current + 1} of {questions.length}
         </span>
-        <span className="text-sm font-medium px-3 py-1 rounded-full bg-gray-800 border border-gray-700">
+        <span className="text-sm font-medium px-3 py-1 rounded-full bg-surface border border-border">
           {score}/{questions.length} correct
         </span>
       </div>
 
-      <h2 className="text-2xl font-bold mb-6">{q.question}</h2>
+      <div className={hasDiagram ? "grid md:grid-cols-2 gap-8" : ""}>
+        {/* Diagram column */}
+        {hasDiagram && (
+          <div className="flex items-start justify-center">
+            <FieldDiagram data={q.diagram!} />
+          </div>
+        )}
 
-      <div className="space-y-3">
-        {q.options.map((opt, idx) => {
-          let style =
-            "border-gray-700 bg-gray-900 hover:border-gray-500 cursor-pointer";
-          if (answered) {
-            if (idx === q.answer) style = "border-emerald-500 bg-emerald-950";
-            else if (idx === selected)
-              style = "border-red-500 bg-red-950";
-            else style = "border-gray-800 bg-gray-900 opacity-50";
-          } else if (idx === selected) {
-            style = "border-emerald-500 bg-gray-800";
-          }
+        {/* Question column */}
+        <div>
+          <h2 className="text-2xl font-bold mb-6">{q.question}</h2>
 
-          return (
-            <button
-              key={idx}
-              onClick={() => handleSelect(idx)}
-              className={`w-full text-left px-5 py-4 rounded-xl border-2 transition-all ${style}`}
+          <div className="space-y-3">
+            {q.options.map((opt, idx) => {
+              let style =
+                "border-border bg-surface hover:border-border-light cursor-pointer";
+              if (answered) {
+                if (idx === q.answer)
+                  style = "border-green-500 bg-green-950/30";
+                else if (idx === selected)
+                  style = "border-mcgill bg-mcgill/10";
+                else style = "border-border bg-surface opacity-40";
+              }
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleSelect(idx)}
+                  className={`w-full text-left px-5 py-4 rounded-xl border-2 transition-all ${style}`}
+                >
+                  <span className="font-medium text-muted mr-3">
+                    {String.fromCharCode(65 + idx)}.
+                  </span>
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Explanation */}
+          {answered && q.explanation && (
+            <div
+              className={`mt-6 px-5 py-4 rounded-xl border text-sm leading-relaxed ${
+                isCorrect
+                  ? "border-green-800 bg-green-950/20 text-green-200"
+                  : "border-mcgill/50 bg-mcgill/5 text-gray-300"
+              }`}
             >
-              <span className="font-medium text-gray-300 mr-3">
-                {String.fromCharCode(65 + idx)}.
-              </span>
-              {opt}
-            </button>
-          );
-        })}
-      </div>
+              <div className="font-semibold mb-1">
+                {isCorrect ? "Correct!" : "Not quite."}
+              </div>
+              {q.explanation}
+            </div>
+          )}
 
-      {answered && (
-        <button
-          onClick={handleNext}
-          className="mt-8 w-full py-3 rounded-xl font-semibold bg-emerald-600 hover:bg-emerald-500 transition-colors"
-        >
-          {current + 1 >= questions.length ? "See Results" : "Next Question"}
-        </button>
-      )}
+          {answered && (
+            <button
+              onClick={handleNext}
+              className="mt-6 w-full py-3 rounded-xl font-semibold bg-mcgill hover:bg-mcgill-light transition-colors"
+            >
+              {current + 1 >= questions.length ? "See Results" : "Next Question"}
+            </button>
+          )}
+        </div>
+      </div>
     </main>
   );
 }

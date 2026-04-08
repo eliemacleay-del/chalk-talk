@@ -3,11 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+const difficulties = [
+  { value: "easy", label: "Easy", desc: "Terminology & recall" },
+  { value: "medium", label: "Medium", desc: "Mixed question types" },
+  { value: "hard", label: "Hard", desc: "Application & analysis" },
+] as const;
+
 export default function UploadPage() {
   const router = useRouter();
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [difficulty, setDifficulty] = useState<string>("medium");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +24,6 @@ export default function UploadPage() {
     setFile(f);
     setFileName(f.name);
 
-    // Auto-read text files into the textarea
     if (f.type === "text/plain" || f.name.endsWith(".txt")) {
       const reader = new FileReader();
       reader.onload = (ev) => {
@@ -34,6 +40,7 @@ export default function UploadPage() {
     try {
       const formData = new FormData();
       formData.append("notes", notes);
+      formData.append("difficulty", difficulty);
       if (file) {
         formData.append("file", file);
       }
@@ -62,7 +69,7 @@ export default function UploadPage() {
   return (
     <main className="max-w-2xl mx-auto px-6 py-16">
       <h1 className="text-3xl font-bold mb-2">Upload Your Notes</h1>
-      <p className="text-gray-400 mb-8">
+      <p className="text-muted mb-8">
         Paste your play notes or upload a file, then hit generate.
       </p>
 
@@ -71,11 +78,11 @@ export default function UploadPage() {
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Paste your play notes here..."
         rows={8}
-        className="w-full rounded-xl bg-gray-900 border border-gray-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none p-4 text-sm resize-y placeholder:text-gray-500 transition-colors"
+        className="w-full rounded-xl bg-surface border border-border focus:border-mcgill focus:ring-1 focus:ring-mcgill outline-none p-4 text-sm resize-y placeholder:text-muted/50 transition-colors"
       />
 
       <div className="mt-4 flex items-center gap-4">
-        <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-sm font-medium transition-colors">
+        <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-light hover:bg-border border border-border text-sm font-medium transition-colors">
           <svg
             className="w-4 h-4"
             fill="none"
@@ -97,14 +104,36 @@ export default function UploadPage() {
           />
         </label>
         {fileName && (
-          <span className="text-sm text-gray-400 truncate max-w-xs">
+          <span className="text-sm text-muted truncate max-w-xs">
             {fileName}
           </span>
         )}
       </div>
 
+      {/* Difficulty selector */}
+      <div className="mt-6">
+        <label className="block text-sm font-medium mb-2">Difficulty</label>
+        <div className="grid grid-cols-3 gap-3">
+          {difficulties.map((d) => (
+            <button
+              key={d.value}
+              type="button"
+              onClick={() => setDifficulty(d.value)}
+              className={`px-4 py-3 rounded-xl border-2 text-left transition-all ${
+                difficulty === d.value
+                  ? "border-mcgill bg-mcgill/10"
+                  : "border-border bg-surface hover:border-border-light"
+              }`}
+            >
+              <div className="font-semibold text-sm">{d.label}</div>
+              <div className="text-xs text-muted mt-0.5">{d.desc}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {error && (
-        <p className="mt-4 text-sm text-red-400 bg-red-950 border border-red-800 rounded-lg px-4 py-2">
+        <p className="mt-4 text-sm text-red-400 bg-red-950/50 border border-red-900 rounded-lg px-4 py-2">
           {error}
         </p>
       )}
@@ -112,7 +141,7 @@ export default function UploadPage() {
       <button
         onClick={handleGenerate}
         disabled={(!notes.trim() && !file) || loading}
-        className="mt-8 w-full py-3 rounded-xl font-semibold text-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="mt-8 w-full py-3 rounded-xl font-semibold text-lg bg-mcgill hover:bg-mcgill-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         {loading ? "Generating..." : "Generate Quiz"}
       </button>

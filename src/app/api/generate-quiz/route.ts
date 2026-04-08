@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { getFootballPrompt } from "@/lib/football-prompt";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -15,7 +16,6 @@ async function extractTextFromFile(file: File): Promise<string> {
     return result.text;
   }
 
-  // For text-based files, just read as text
   return buffer.toString("utf-8");
 }
 
@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const notes = (formData.get("notes") as string) || "";
   const file = formData.get("file") as File | null;
+  const difficulty = (formData.get("difficulty") as string) || "medium";
 
   let content = notes;
 
@@ -46,30 +47,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const prompt = `You are a quiz generator for athletes studying their playbook.
-
-Given the following notes, generate exactly 5 multiple-choice questions to test the reader's understanding.
-
-Return ONLY valid JSON in this exact format, no other text:
-[
-  {
-    "question": "The question text",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "answer": 0
-  }
-]
-
-The "answer" field is the zero-based index of the correct option.
-Make questions specific to the content provided. Vary difficulty.
-
-NOTES:
-${content}`;
+  const systemPrompt = getFootballPrompt(
+    difficulty as "easy" | "medium" | "hard"
+  );
 
   try {
     const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `NOTES:\n${content}` },
+      ],
+      temperature: 0.5,
+      top_p: 0.9,
     });
 
     const text = completion.choices[0]?.message?.content || "";
@@ -82,7 +72,27 @@ ${content}`;
       );
     }
 
-    const questions = JSON.parse(jsonMatch[0]);
+    const questions = JSON.parse(jsonMatch[0]).map(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (q: any) => {
+        // Sanitize diagram data
+        if (q.diagram && (!q.diagram.players || !Array.isArray(q.diagram.players) || q.diagram.players.length === 0)) {
+          q.diagram = null;
+        }
+        if (q.diagram) {
+          // Clamp all coordinates to 0-100
+          q.diagram.players = q.diagram.players.map(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (p: any) => ({
+              ...p,
+              x: Math.max(0, Math.min(100, p.x ?? 50)),
+              y: Math.max(0, Math.min(100, p.y ?? 50)),
+            })
+          );
+        }
+        return q;
+      }
+    );
     return NextResponse.json({ questions });
   } catch (e) {
     console.error("Groq error:", e);
