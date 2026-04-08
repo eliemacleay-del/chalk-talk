@@ -29,23 +29,9 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Redirect unauthenticated users to login (except for public pages)
-  const publicPaths = ["/", "/login", "/signup", "/auth/callback"];
-  const isPublic = publicPaths.some((p) => request.nextUrl.pathname === p);
-
-  if (!user && !isPublic) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
-
-  // Redirect authenticated users away from login/signup
-  if (user && (request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/signup")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/upload";
-    return NextResponse.redirect(url);
-  }
-
+  // Auth temporarily disabled — all routes are public.
+  // Keep Supabase session refresh wired in case we re-enable later.
+  void user;
   return supabaseResponse;
 }
 
