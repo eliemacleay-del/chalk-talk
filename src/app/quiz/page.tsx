@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FieldDiagram } from "@/components/FieldDiagram";
+import { RosterCard, AnswerRow } from "@/components/RosterCard";
 import type { Question } from "@/lib/types";
 
 export default function QuizPage() {
@@ -27,10 +28,8 @@ export default function QuizPage() {
     return (
       <main className="max-w-xl mx-auto px-6 py-20 text-center">
         <div className="inline-flex items-center gap-2">
-          <span className="w-1.5 h-1.5 bg-accent animate-pulse" />
-          <span className="text-[10px] uppercase-display text-muted">
-            Loading Reps
-          </span>
+          <span className="w-1.5 h-1.5 bg-ink animate-pulse" />
+          <span className="stat-label">Loading Reps</span>
         </div>
       </main>
     );
@@ -60,51 +59,41 @@ export default function QuizPage() {
   if (finished) {
     const pct = score / questions.length;
     const grade =
-      pct === 1 ? "PERFECT"
-      : pct >= 0.8 ? "ELITE"
-      : pct >= 0.6 ? "SOLID"
-      : pct >= 0.4 ? "GROWING"
-      : "GRIND MORE";
+      pct === 1 ? "Perfect"
+      : pct >= 0.8 ? "Elite"
+      : pct >= 0.6 ? "Solid"
+      : pct >= 0.4 ? "Growing"
+      : "Grind More";
 
     return (
       <main className="max-w-2xl mx-auto px-6 py-20">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-1.5 h-1.5 bg-accent" />
-          <span className="text-[10px] uppercase-display text-muted">Final</span>
-        </div>
-        <h1 className="text-4xl font-black uppercase tracking-tighter mb-10">
-          Session Complete
+        <div className="stat-label mb-3">Final</div>
+        <h1 className="display text-5xl sm:text-6xl text-ink mb-10">
+          Session<br />complete.
         </h1>
 
-        {/* Scoreboard */}
+        {/* Box-score scoreboard */}
         <div className="border border-border bg-surface">
           <div className="grid grid-cols-3 divide-x divide-border">
-            <div className="px-6 py-8">
-              <div className="text-[10px] uppercase-display text-muted mb-2">
-                Score
-              </div>
-              <div className="font-black tabular tracking-tighter text-5xl text-accent">
+            <Stat label="Score">
+              <span className="font-mono tabular text-5xl font-black text-ink">
                 {score}
-                <span className="text-muted text-2xl">/{questions.length}</span>
-              </div>
-            </div>
-            <div className="px-6 py-8">
-              <div className="text-[10px] uppercase-display text-muted mb-2">
-                Accuracy
-              </div>
-              <div className="font-black tabular tracking-tighter text-5xl">
+              </span>
+              <span className="font-mono tabular text-2xl text-muted">
+                /{questions.length}
+              </span>
+            </Stat>
+            <Stat label="Accuracy">
+              <span className="font-mono tabular text-5xl font-black text-ink">
                 {Math.round(pct * 100)}
-                <span className="text-muted text-2xl">%</span>
-              </div>
-            </div>
-            <div className="px-6 py-8">
-              <div className="text-[10px] uppercase-display text-muted mb-2">
-                Grade
-              </div>
-              <div className="font-black uppercase tracking-tight text-2xl text-ink mt-3">
+              </span>
+              <span className="font-mono tabular text-2xl text-muted">%</span>
+            </Stat>
+            <Stat label="Grade">
+              <span className="display-up text-3xl text-ink mt-2 inline-block">
                 {grade}
-              </div>
-            </div>
+              </span>
+            </Stat>
           </div>
         </div>
 
@@ -117,15 +106,15 @@ export default function QuizPage() {
               setScore(0);
               setFinished(false);
             }}
-            className="h-12 bg-accent hover:bg-accent-2 text-bg font-black uppercase tracking-wider text-sm transition-colors"
+            className="h-12 bg-ink text-bg hover:bg-ink/90 transition-colors flex items-center justify-center"
           >
-            Run It Back
+            <span className="display-up text-base">Run It Back</span>
           </button>
           <a
             href="/upload"
-            className="h-12 inline-flex items-center justify-center border border-border-2 hover:border-border-3 font-black uppercase tracking-wider text-sm transition-colors"
+            className="h-12 inline-flex items-center justify-center border border-border-2 hover:border-border-3 transition-colors"
           >
-            New Quiz
+            <span className="display-up text-base text-ink">New Session</span>
           </a>
         </div>
       </main>
@@ -138,24 +127,28 @@ export default function QuizPage() {
       <div className="border border-border bg-surface mb-8">
         <div className="grid grid-cols-3 divide-x divide-border">
           <div className="px-5 py-4">
-            <div className="text-[9px] uppercase-display text-muted mb-1">Question</div>
-            <div className="font-black tabular text-2xl tracking-tight">
+            <div className="stat-label mb-1">Question</div>
+            <div className="font-mono tabular text-2xl font-black text-ink">
               {String(current + 1).padStart(2, "0")}
-              <span className="text-muted text-sm">/{String(questions.length).padStart(2, "0")}</span>
+              <span className="text-muted text-sm">
+                /{String(questions.length).padStart(2, "0")}
+              </span>
             </div>
           </div>
           <div className="px-5 py-4">
-            <div className="text-[9px] uppercase-display text-muted mb-1">Score</div>
-            <div className="font-black tabular text-2xl tracking-tight text-accent">
+            <div className="stat-label mb-1">Score</div>
+            <div className="font-mono tabular text-2xl font-black text-ink">
               {score}
             </div>
           </div>
           <div className="px-5 py-4">
-            <div className="text-[9px] uppercase-display text-muted mb-1">Progress</div>
-            <div className="mt-2 h-2 bg-border-2 overflow-hidden">
+            <div className="stat-label mb-1">Progress</div>
+            <div className="mt-2 h-1.5 bg-border-2 overflow-hidden">
               <div
-                className="h-full bg-accent transition-all duration-500"
-                style={{ width: `${((current + 1) / questions.length) * 100}%` }}
+                className="h-full bg-ink transition-all duration-500"
+                style={{
+                  width: `${((current + 1) / questions.length) * 100}%`,
+                }}
               />
             </div>
           </div>
@@ -166,45 +159,35 @@ export default function QuizPage() {
         {/* Diagram column */}
         {hasDiagram && (
           <div className="border border-border bg-surface p-4">
-            <div className="text-[10px] uppercase-display text-muted mb-3">
-              Film
-            </div>
+            <div className="stat-label mb-3">Film</div>
             <FieldDiagram data={q.diagram!} />
           </div>
         )}
 
-        {/* Question column */}
-        <div>
-          <div className="text-[10px] uppercase-display text-muted mb-3">
-            Read
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold mb-6 leading-tight">
+        {/* Question — wrapped in roster card */}
+        <RosterCard number={current + 1} position="Read">
+          <h2 className="display text-2xl sm:text-3xl text-ink mb-6 leading-tight">
             {q.question}
           </h2>
 
           <div className="space-y-2">
             {q.options.map((opt, idx) => {
-              let style =
-                "border-border bg-surface hover:border-border-2 hover:bg-surface-2 cursor-pointer";
+              let state: "default" | "selected" | "correct" | "wrong" | "muted" =
+                "default";
               if (answered) {
-                if (idx === q.answer)
-                  style = "border-accent bg-accent/10 text-ink";
-                else if (idx === selected)
-                  style = "border-bad bg-bad/5 text-ink";
-                else style = "border-border bg-surface opacity-30";
+                if (idx === q.answer) state = "correct";
+                else if (idx === selected) state = "wrong";
+                else state = "muted";
               }
-
               return (
-                <button
+                <AnswerRow
                   key={idx}
+                  letter={String.fromCharCode(65 + idx)}
+                  text={opt}
+                  state={state}
                   onClick={() => handleSelect(idx)}
-                  className={`w-full text-left px-5 py-4 border-2 transition-all flex items-start gap-4 ${style}`}
-                >
-                  <span className="font-mono text-xs text-muted tabular pt-0.5">
-                    0{idx + 1}
-                  </span>
-                  <span className="text-sm leading-relaxed">{opt}</span>
-                </button>
+                  disabled={answered}
+                />
               );
             })}
           </div>
@@ -214,14 +197,15 @@ export default function QuizPage() {
             <div
               className={`mt-6 px-5 py-4 border-l-2 ${
                 isCorrect
-                  ? "border-accent bg-accent/5"
+                  ? "border-good bg-good/5"
                   : "border-bad bg-bad/5"
               }`}
             >
               <div
-                className={`text-[10px] uppercase-display mb-2 ${
-                  isCorrect ? "text-accent" : "text-bad"
-                }`}
+                className="stat-label mb-2"
+                style={{
+                  color: isCorrect ? "var(--color-good)" : "var(--color-bad)",
+                }}
               >
                 {isCorrect ? "Correct" : "Incorrect"}
               </div>
@@ -234,9 +218,11 @@ export default function QuizPage() {
           {answered && (
             <button
               onClick={handleNext}
-              className="mt-6 w-full h-12 bg-accent hover:bg-accent-2 text-bg font-black uppercase tracking-wider text-sm transition-colors flex items-center justify-center gap-3"
+              className="mt-6 w-full h-12 bg-ink text-bg hover:bg-ink/90 transition-colors flex items-center justify-center gap-3"
             >
-              {current + 1 >= questions.length ? "See Results" : "Next Rep"}
+              <span className="display-up text-base">
+                {current + 1 >= questions.length ? "See Results" : "Next Rep"}
+              </span>
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -248,8 +234,23 @@ export default function QuizPage() {
               </svg>
             </button>
           )}
-        </div>
+        </RosterCard>
       </div>
     </main>
+  );
+}
+
+function Stat({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="px-6 py-8">
+      <div className="stat-label mb-2">{label}</div>
+      <div className="flex items-baseline gap-1">{children}</div>
+    </div>
   );
 }

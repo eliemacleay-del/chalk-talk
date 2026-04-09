@@ -33,17 +33,19 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <main className="max-w-sm mx-auto px-6 py-20 text-center">
-        <h1 className="text-3xl font-bold mb-4">Check your email</h1>
-        <p className="text-muted">
-          We sent a confirmation link to <span className="text-white font-medium">{email}</span>.
-          Click it to activate your account, then come back and sign in.
+      <main className="max-w-sm mx-auto px-6 py-20">
+        <div className="stat-label mb-3">Confirm</div>
+        <h1 className="display text-5xl text-ink mb-4">Check<br />your email.</h1>
+        <p className="text-sm text-muted">
+          We sent a confirmation link to{" "}
+          <span className="text-ink font-mono">{email}</span>. Click it to
+          activate your account, then come back and sign in.
         </p>
         <a
           href="/login"
-          className="mt-6 inline-block px-6 py-2.5 rounded-lg font-semibold bg-accent hover:bg-accent-light transition-colors"
+          className="mt-8 inline-flex items-center justify-center h-12 px-7 bg-ink text-bg hover:bg-ink/90 transition-colors"
         >
-          Go to Sign In
+          <span className="display-up text-base">Go to Sign In</span>
         </a>
       </main>
     );
@@ -51,55 +53,81 @@ export default function SignupPage() {
 
   return (
     <main className="max-w-sm mx-auto px-6 py-20">
-      <h1 className="text-3xl font-bold mb-2">Create an account</h1>
-      <p className="text-muted mb-8">Start quizzing yourself in seconds.</p>
+      <div className="stat-label mb-3">New Player</div>
+      <h1 className="display text-5xl text-ink mb-3">Create<br />an account.</h1>
+      <p className="text-sm text-muted mb-10">Start running reps in seconds.</p>
 
-      <form onSubmit={handleSignup} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-accent focus:ring-1 focus:ring-accent outline-none text-sm transition-colors"
-            placeholder="you@example.com"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-accent focus:ring-1 focus:ring-accent outline-none text-sm transition-colors"
-            placeholder="At least 6 characters"
-          />
-        </div>
+      <form onSubmit={handleSignup} className="space-y-5">
+        <Field
+          label="Email"
+          type="email"
+          value={email}
+          onChange={setEmail}
+          placeholder="you@example.com"
+        />
+        <Field
+          label="Password"
+          type="password"
+          value={password}
+          onChange={setPassword}
+          placeholder="At least 6 characters"
+          minLength={6}
+        />
 
         {error && (
-          <p className="text-sm text-red-400 bg-red-950/50 border border-red-900 rounded-lg px-4 py-2">
+          <div className="px-4 py-3 border border-bad/40 bg-bad/5 text-sm text-ink">
             {error}
-          </p>
+          </div>
         )}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 rounded-lg font-semibold bg-accent hover:bg-accent-light disabled:opacity-40 transition-colors"
+          className="w-full h-12 bg-ink text-bg hover:bg-ink/90 disabled:opacity-30 transition-colors flex items-center justify-center"
         >
-          {loading ? "Creating account..." : "Sign Up"}
+          <span className="display-up text-base">
+            {loading ? "Creating" : "Sign Up"}
+          </span>
         </button>
       </form>
 
-      <p className="mt-6 text-sm text-muted text-center">
+      <p className="mt-8 text-xs text-muted text-center uppercase tracking-[0.12em]">
         Already have an account?{" "}
-        <a href="/login" className="text-accent hover:underline">
+        <a href="/login" className="text-ink hover:underline font-bold">
           Sign in
         </a>
       </p>
     </main>
+  );
+}
+
+function Field({
+  label,
+  type,
+  value,
+  onChange,
+  placeholder,
+  minLength,
+}: {
+  label: string;
+  type: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  minLength?: number;
+}) {
+  return (
+    <div>
+      <div className="stat-label mb-2">{label}</div>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required
+        minLength={minLength}
+        placeholder={placeholder}
+        className="w-full px-4 h-11 bg-surface border border-border focus:border-border-3 outline-none text-sm font-mono placeholder:text-muted-2 transition-colors"
+      />
+    </div>
   );
 }

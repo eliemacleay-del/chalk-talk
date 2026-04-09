@@ -1,58 +1,69 @@
 @import "tailwindcss";
 
 @theme {
-  /* Monochrome base */
-  --color-bg: #050505;
-  --color-surface: #0C0C0C;
-  --color-surface-2: #131313;
-  --color-surface-3: #1A1A1A;
+  /* Monochrome base — chromatic energy comes from photography, not a swatch */
+  --color-bg: #0A0A0A;
+  --color-surface: #111111;
+  --color-surface-2: #161616;
+  --color-surface-3: #1C1C1C;
   --color-border: #1F1F1F;
   --color-border-2: #2A2A2A;
   --color-border-3: #3A3A3A;
 
   /* Type */
   --color-ink: #FAFAFA;
-  --color-muted: #6B6B6B;
+  --color-muted: #7A7A7A;
   --color-muted-2: #4A4A4A;
 
-  /* Single sharp accent — electric lime */
-  --color-accent: #D7FF1E;
-  --color-accent-2: #B8E000;
-
-  /* Status */
+  /* Functional only — never decorative */
   --color-good: #00E27A;
   --color-bad: #FF3B5C;
 
-  /* Display font stack — fall back gracefully */
-  --font-display: "Geist", -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+  /* Reserved for future per-team theming */
+  --color-team: #FAFAFA;
+
+  /* Font stacks (next/font writes the actual --font-* CSS vars on <html>) */
+  --font-display: var(--font-barlow), "Barlow Condensed", "Oswald", sans-serif;
+  --font-body: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
 }
 
 html, body {
   background: var(--color-bg);
   color: var(--color-ink);
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Sportsbook ticker / number styling helpers */
+/* Display utility — italic Barlow Condensed Black, used for all big headlines */
+.display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 0.85;
+}
+
+.display-up {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
+}
+
+/* Tiny stat label — uppercase, tracked, muted */
+.stat-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-muted);
+}
+
 .font-mono { font-family: var(--font-mono); }
 .tabular { font-variant-numeric: tabular-nums; }
-.uppercase-display {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 800;
-}
 
-/* Hairline divider for sport-card aesthetic */
-.hairline {
-  border-color: var(--color-border);
-}
-
-/* Subtle scanline-free grid behind hero */
-.bg-grid {
-  background-image:
-    linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
+.hairline { border-color: var(--color-border); }

@@ -34,54 +34,77 @@ export default function LoginPage() {
 
   return (
     <main className="max-w-sm mx-auto px-6 py-20">
-      <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
-      <p className="text-muted mb-8">Sign in to continue studying.</p>
+      <div className="stat-label mb-3">Sign In</div>
+      <h1 className="display text-5xl text-ink mb-3">Welcome<br />back.</h1>
+      <p className="text-sm text-muted mb-10">Get back to your reps.</p>
 
-      <form onSubmit={handleLogin} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-accent focus:ring-1 focus:ring-accent outline-none text-sm transition-colors"
-            placeholder="you@example.com"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-accent focus:ring-1 focus:ring-accent outline-none text-sm transition-colors"
-            placeholder="Your password"
-          />
-        </div>
+      <form onSubmit={handleLogin} className="space-y-5">
+        <Field
+          label="Email"
+          type="email"
+          value={email}
+          onChange={setEmail}
+          placeholder="you@example.com"
+        />
+        <Field
+          label="Password"
+          type="password"
+          value={password}
+          onChange={setPassword}
+          placeholder="••••••••"
+        />
 
         {error && (
-          <p className="text-sm text-red-400 bg-red-950/50 border border-red-900 rounded-lg px-4 py-2">
+          <div className="px-4 py-3 border border-bad/40 bg-bad/5 text-sm text-ink">
             {error}
-          </p>
+          </div>
         )}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 rounded-lg font-semibold bg-accent hover:bg-accent-light disabled:opacity-40 transition-colors"
+          className="w-full h-12 bg-ink text-bg hover:bg-ink/90 disabled:opacity-30 transition-colors flex items-center justify-center"
         >
-          {loading ? "Signing in..." : "Sign In"}
+          <span className="display-up text-base">
+            {loading ? "Signing in" : "Sign In"}
+          </span>
         </button>
       </form>
 
-      <p className="mt-6 text-sm text-muted text-center">
-        Don&apos;t have an account?{" "}
-        <a href="/signup" className="text-accent hover:underline">
+      <p className="mt-8 text-xs text-muted text-center uppercase tracking-[0.12em]">
+        No account?{" "}
+        <a href="/signup" className="text-ink hover:underline font-bold">
           Sign up
         </a>
       </p>
     </main>
+  );
+}
+
+function Field({
+  label,
+  type,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  type: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <div>
+      <div className="stat-label mb-2">{label}</div>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required
+        placeholder={placeholder}
+        className="w-full px-4 h-11 bg-surface border border-border focus:border-border-3 outline-none text-sm font-mono placeholder:text-muted-2 transition-colors"
+      />
+    </div>
   );
 }
