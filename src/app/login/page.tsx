@@ -45,7 +45,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-mcgill focus:ring-1 focus:ring-mcgill outline-none text-sm transition-colors"
+            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-accent focus:ring-1 focus:ring-accent outline-none text-sm transition-colors"
             placeholder="you@example.com"
           />
         </div>
@@ -56,7 +56,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-mcgill focus:ring-1 focus:ring-mcgill outline-none text-sm transition-colors"
+            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-accent focus:ring-1 focus:ring-accent outline-none text-sm transition-colors"
             placeholder="Your password"
           />
         </div>
@@ -70,7 +70,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 rounded-lg font-semibold bg-mcgill hover:bg-mcgill-light disabled:opacity-40 transition-colors"
+          className="w-full py-2.5 rounded-lg font-semibold bg-accent hover:bg-accent-light disabled:opacity-40 transition-colors"
         >
           {loading ? "Signing in..." : "Sign In"}
         </button>
@@ -78,7 +78,7 @@ export default function LoginPage() {
 
       <p className="mt-6 text-sm text-muted text-center">
         Don&apos;t have an account?{" "}
-        <a href="/signup" className="text-mcgill hover:underline">
+        <a href="/signup" className="text-accent hover:underline">
           Sign up
         </a>
       </p>

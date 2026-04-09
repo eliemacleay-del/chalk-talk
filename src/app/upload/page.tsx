@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const difficulties = [
-  { value: "easy", label: "Easy", desc: "Terminology & recall" },
-  { value: "medium", label: "Medium", desc: "Mixed question types" },
-  { value: "hard", label: "Hard", desc: "Application & analysis" },
+  { value: "easy", label: "ROOKIE", desc: "Recall & terminology" },
+  { value: "medium", label: "STARTER", desc: "Mixed difficulty" },
+  { value: "hard", label: "ALL-PRO", desc: "Application & analysis" },
 ] as const;
 
 export default function UploadPage() {
@@ -68,35 +68,48 @@ export default function UploadPage() {
 
   return (
     <main className="max-w-2xl mx-auto px-6 py-16">
-      <h1 className="text-3xl font-bold mb-2">Upload Your Notes</h1>
-      <p className="text-muted mb-8">
-        Paste your play notes or upload a file, then hit generate.
+      {/* Header strip */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-1.5 h-1.5 bg-accent" />
+        <span className="text-[10px] uppercase-display text-muted">
+          New Session
+        </span>
+      </div>
+      <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter mb-3">
+        Build Your Reps
+      </h1>
+      <p className="text-muted text-sm mb-10">
+        Drop in playbook notes or upload a PDF. The AI does the rest.
       </p>
 
+      {/* Notes input */}
+      <label className="block text-[10px] uppercase-display text-muted mb-2">
+        Playbook Notes
+      </label>
       <textarea
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
-        placeholder="Paste your play notes here..."
-        rows={8}
-        className="w-full rounded-xl bg-surface border border-border focus:border-mcgill focus:ring-1 focus:ring-mcgill outline-none p-4 text-sm resize-y placeholder:text-muted/50 transition-colors"
+        placeholder="Paste your install sheet, coverage rules, or any text from your playbook..."
+        rows={10}
+        className="w-full bg-surface border border-border focus:border-accent outline-none p-4 text-sm resize-y placeholder:text-muted-2 transition-colors font-mono leading-relaxed"
       />
 
-      <div className="mt-4 flex items-center gap-4">
-        <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-light hover:bg-border border border-border text-sm font-medium transition-colors">
+      {/* File upload */}
+      <div className="mt-3 flex items-center gap-3">
+        <label className="cursor-pointer inline-flex items-center gap-2 px-4 h-10 bg-surface hover:bg-surface-2 border border-border hover:border-border-2 text-xs font-bold uppercase tracking-wider transition-colors">
           <svg
-            className="w-4 h-4"
+            className="w-3.5 h-3.5"
             fill="none"
             stroke="currentColor"
-            strokeWidth={2}
+            strokeWidth={2.5}
             viewBox="0 0 24 24"
           >
             <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              strokeLinecap="square"
               d="M12 16v-8m0 0l-3 3m3-3l3 3M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"
             />
           </svg>
-          Upload File
+          Upload PDF
           <input
             type="file"
             accept=".pdf,.txt,application/pdf,text/plain"
@@ -105,46 +118,78 @@ export default function UploadPage() {
           />
         </label>
         {fileName && (
-          <span className="text-sm text-muted truncate max-w-xs">
+          <span className="text-xs font-mono text-muted truncate max-w-xs">
             {fileName}
           </span>
         )}
       </div>
 
       {/* Difficulty selector */}
-      <div className="mt-6">
-        <label className="block text-sm font-medium mb-2">Difficulty</label>
-        <div className="grid grid-cols-3 gap-3">
+      <div className="mt-10">
+        <label className="block text-[10px] uppercase-display text-muted mb-3">
+          Difficulty
+        </label>
+        <div className="grid grid-cols-3 gap-px bg-border border border-border">
           {difficulties.map((d) => (
             <button
               key={d.value}
               type="button"
               onClick={() => setDifficulty(d.value)}
-              className={`px-4 py-3 rounded-xl border-2 text-left transition-all ${
+              className={`px-4 py-4 text-left transition-all ${
                 difficulty === d.value
-                  ? "border-mcgill bg-mcgill/10"
-                  : "border-border bg-surface hover:border-border-light"
+                  ? "bg-accent text-bg"
+                  : "bg-surface hover:bg-surface-2 text-ink"
               }`}
             >
-              <div className="font-semibold text-sm">{d.label}</div>
-              <div className="text-xs text-muted mt-0.5">{d.desc}</div>
+              <div className="font-black text-sm uppercase tracking-wider">
+                {d.label}
+              </div>
+              <div
+                className={`text-[10px] mt-1 ${
+                  difficulty === d.value ? "text-bg/70" : "text-muted"
+                }`}
+              >
+                {d.desc}
+              </div>
             </button>
           ))}
         </div>
       </div>
 
       {error && (
-        <p className="mt-4 text-sm text-red-400 bg-red-950/50 border border-red-900 rounded-lg px-4 py-2">
-          {error}
-        </p>
+        <div className="mt-6 px-4 py-3 border border-bad/40 bg-bad/5">
+          <div className="text-[10px] uppercase-display text-bad mb-1">
+            Error
+          </div>
+          <div className="text-sm text-ink">{error}</div>
+        </div>
       )}
 
+      {/* Generate button */}
       <button
         onClick={handleGenerate}
         disabled={(!notes.trim() && !file) || loading}
-        className="mt-8 w-full py-3 rounded-xl font-semibold text-lg bg-mcgill hover:bg-mcgill-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="mt-10 w-full h-14 font-black uppercase tracking-wider text-sm bg-accent hover:bg-accent-2 text-bg disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3"
       >
-        {loading ? "Generating..." : "Generate Quiz"}
+        {loading ? (
+          <>
+            <span className="w-2 h-2 bg-bg animate-pulse" />
+            Generating Reps...
+          </>
+        ) : (
+          <>
+            Generate Quiz
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={3}
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="square" d="M5 12h14M13 5l7 7-7 7" />
+            </svg>
+          </>
+        )}
       </button>
     </main>
   );

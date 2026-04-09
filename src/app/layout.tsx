@@ -3,8 +3,8 @@ import "./globals.css";
 import { Nav } from "./nav";
 
 export const metadata: Metadata = {
-  title: "Chalk Talk",
-  description: "Gamified study app for athletes",
+  title: "RepIQ — Train Your Football IQ",
+  description: "Turn your playbook into reps. AI-built quizzes for football players.",
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-[#0A0A0A] text-white min-h-screen antialiased">
+      <body className="bg-bg text-ink min-h-screen antialiased">
         <Nav />
         {children}
       </body>

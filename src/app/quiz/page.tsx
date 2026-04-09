@@ -26,7 +26,12 @@ export default function QuizPage() {
   if (questions.length === 0) {
     return (
       <main className="max-w-xl mx-auto px-6 py-20 text-center">
-        <p className="text-muted">Loading quiz...</p>
+        <div className="inline-flex items-center gap-2">
+          <span className="w-1.5 h-1.5 bg-accent animate-pulse" />
+          <span className="text-[10px] uppercase-display text-muted">
+            Loading Reps
+          </span>
+        </div>
       </main>
     );
   }
@@ -54,26 +59,56 @@ export default function QuizPage() {
 
   if (finished) {
     const pct = score / questions.length;
+    const grade =
+      pct === 1 ? "PERFECT"
+      : pct >= 0.8 ? "ELITE"
+      : pct >= 0.6 ? "SOLID"
+      : pct >= 0.4 ? "GROWING"
+      : "GRIND MORE";
+
     return (
-      <main className="max-w-xl mx-auto px-6 py-20 text-center">
-        <h1 className="text-4xl font-bold mb-4">Quiz Complete!</h1>
-        <p className="text-6xl font-extrabold text-mcgill mb-2">
-          {score}/{questions.length}
-        </p>
-        <p className="text-muted mb-8">
-          {pct === 1
-            ? "Perfect score — you're game-day ready!"
-            : pct >= 0.5
-              ? "Solid work. Keep studying to lock it in."
-              : "Time to hit the playbook again."}
-        </p>
-        <div className="flex gap-4 justify-center">
-          <a
-            href="/upload"
-            className="px-6 py-3 rounded-xl bg-surface hover:bg-surface-light border border-border font-medium transition-colors"
-          >
-            New Quiz
-          </a>
+      <main className="max-w-2xl mx-auto px-6 py-20">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-1.5 h-1.5 bg-accent" />
+          <span className="text-[10px] uppercase-display text-muted">Final</span>
+        </div>
+        <h1 className="text-4xl font-black uppercase tracking-tighter mb-10">
+          Session Complete
+        </h1>
+
+        {/* Scoreboard */}
+        <div className="border border-border bg-surface">
+          <div className="grid grid-cols-3 divide-x divide-border">
+            <div className="px-6 py-8">
+              <div className="text-[10px] uppercase-display text-muted mb-2">
+                Score
+              </div>
+              <div className="font-black tabular tracking-tighter text-5xl text-accent">
+                {score}
+                <span className="text-muted text-2xl">/{questions.length}</span>
+              </div>
+            </div>
+            <div className="px-6 py-8">
+              <div className="text-[10px] uppercase-display text-muted mb-2">
+                Accuracy
+              </div>
+              <div className="font-black tabular tracking-tighter text-5xl">
+                {Math.round(pct * 100)}
+                <span className="text-muted text-2xl">%</span>
+              </div>
+            </div>
+            <div className="px-6 py-8">
+              <div className="text-[10px] uppercase-display text-muted mb-2">
+                Grade
+              </div>
+              <div className="font-black uppercase tracking-tight text-2xl text-ink mt-3">
+                {grade}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10 grid grid-cols-2 gap-3">
           <button
             onClick={() => {
               setCurrent(0);
@@ -82,68 +117,93 @@ export default function QuizPage() {
               setScore(0);
               setFinished(false);
             }}
-            className="px-6 py-3 rounded-xl bg-mcgill hover:bg-mcgill-light font-medium transition-colors"
+            className="h-12 bg-accent hover:bg-accent-2 text-bg font-black uppercase tracking-wider text-sm transition-colors"
           >
-            Retry
+            Run It Back
           </button>
+          <a
+            href="/upload"
+            className="h-12 inline-flex items-center justify-center border border-border-2 hover:border-border-3 font-black uppercase tracking-wider text-sm transition-colors"
+          >
+            New Quiz
+          </a>
         </div>
       </main>
     );
   }
 
   return (
-    <main className={`mx-auto px-6 py-16 ${hasDiagram ? "max-w-4xl" : "max-w-xl"}`}>
-      {/* Progress bar */}
-      <div className="w-full h-1 bg-border rounded-full mb-8 overflow-hidden">
-        <div
-          className="h-full bg-mcgill rounded-full transition-all duration-300"
-          style={{ width: `${((current + 1) / questions.length) * 100}%` }}
-        />
+    <main className={`mx-auto px-6 py-12 ${hasDiagram ? "max-w-5xl" : "max-w-2xl"}`}>
+      {/* Scoreboard header */}
+      <div className="border border-border bg-surface mb-8">
+        <div className="grid grid-cols-3 divide-x divide-border">
+          <div className="px-5 py-4">
+            <div className="text-[9px] uppercase-display text-muted mb-1">Question</div>
+            <div className="font-black tabular text-2xl tracking-tight">
+              {String(current + 1).padStart(2, "0")}
+              <span className="text-muted text-sm">/{String(questions.length).padStart(2, "0")}</span>
+            </div>
+          </div>
+          <div className="px-5 py-4">
+            <div className="text-[9px] uppercase-display text-muted mb-1">Score</div>
+            <div className="font-black tabular text-2xl tracking-tight text-accent">
+              {score}
+            </div>
+          </div>
+          <div className="px-5 py-4">
+            <div className="text-[9px] uppercase-display text-muted mb-1">Progress</div>
+            <div className="mt-2 h-2 bg-border-2 overflow-hidden">
+              <div
+                className="h-full bg-accent transition-all duration-500"
+                style={{ width: `${((current + 1) / questions.length) * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="flex items-center justify-between mb-8">
-        <span className="text-sm text-muted">
-          Question {current + 1} of {questions.length}
-        </span>
-        <span className="text-sm font-medium px-3 py-1 rounded-full bg-surface border border-border">
-          {score}/{questions.length} correct
-        </span>
-      </div>
-
-      <div className={hasDiagram ? "grid md:grid-cols-2 gap-8" : ""}>
+      <div className={hasDiagram ? "grid md:grid-cols-2 gap-6" : ""}>
         {/* Diagram column */}
         {hasDiagram && (
-          <div className="flex items-start justify-center">
+          <div className="border border-border bg-surface p-4">
+            <div className="text-[10px] uppercase-display text-muted mb-3">
+              Film
+            </div>
             <FieldDiagram data={q.diagram!} />
           </div>
         )}
 
         {/* Question column */}
         <div>
-          <h2 className="text-2xl font-bold mb-6">{q.question}</h2>
+          <div className="text-[10px] uppercase-display text-muted mb-3">
+            Read
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 leading-tight">
+            {q.question}
+          </h2>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {q.options.map((opt, idx) => {
               let style =
-                "border-border bg-surface hover:border-border-light cursor-pointer";
+                "border-border bg-surface hover:border-border-2 hover:bg-surface-2 cursor-pointer";
               if (answered) {
                 if (idx === q.answer)
-                  style = "border-green-500 bg-green-950/30";
+                  style = "border-accent bg-accent/10 text-ink";
                 else if (idx === selected)
-                  style = "border-mcgill bg-mcgill/10";
-                else style = "border-border bg-surface opacity-40";
+                  style = "border-bad bg-bad/5 text-ink";
+                else style = "border-border bg-surface opacity-30";
               }
 
               return (
                 <button
                   key={idx}
                   onClick={() => handleSelect(idx)}
-                  className={`w-full text-left px-5 py-4 rounded-xl border-2 transition-all ${style}`}
+                  className={`w-full text-left px-5 py-4 border-2 transition-all flex items-start gap-4 ${style}`}
                 >
-                  <span className="font-medium text-muted mr-3">
-                    {String.fromCharCode(65 + idx)}.
+                  <span className="font-mono text-xs text-muted tabular pt-0.5">
+                    0{idx + 1}
                   </span>
-                  {opt}
+                  <span className="text-sm leading-relaxed">{opt}</span>
                 </button>
               );
             })}
@@ -152,25 +212,40 @@ export default function QuizPage() {
           {/* Explanation */}
           {answered && q.explanation && (
             <div
-              className={`mt-6 px-5 py-4 rounded-xl border text-sm leading-relaxed ${
+              className={`mt-6 px-5 py-4 border-l-2 ${
                 isCorrect
-                  ? "border-green-800 bg-green-950/20 text-green-200"
-                  : "border-mcgill/50 bg-mcgill/5 text-gray-300"
+                  ? "border-accent bg-accent/5"
+                  : "border-bad bg-bad/5"
               }`}
             >
-              <div className="font-semibold mb-1">
-                {isCorrect ? "Correct!" : "Not quite."}
+              <div
+                className={`text-[10px] uppercase-display mb-2 ${
+                  isCorrect ? "text-accent" : "text-bad"
+                }`}
+              >
+                {isCorrect ? "Correct" : "Incorrect"}
               </div>
-              {q.explanation}
+              <div className="text-sm text-ink leading-relaxed">
+                {q.explanation}
+              </div>
             </div>
           )}
 
           {answered && (
             <button
               onClick={handleNext}
-              className="mt-6 w-full py-3 rounded-xl font-semibold bg-mcgill hover:bg-mcgill-light transition-colors"
+              className="mt-6 w-full h-12 bg-accent hover:bg-accent-2 text-bg font-black uppercase tracking-wider text-sm transition-colors flex items-center justify-center gap-3"
             >
-              {current + 1 >= questions.length ? "See Results" : "Next Question"}
+              {current + 1 >= questions.length ? "See Results" : "Next Rep"}
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={3}
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="square" d="M5 12h14M13 5l7 7-7 7" />
+              </svg>
             </button>
           )}
         </div>

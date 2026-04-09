@@ -41,7 +41,7 @@ export default function SignupPage() {
         </p>
         <a
           href="/login"
-          className="mt-6 inline-block px-6 py-2.5 rounded-lg font-semibold bg-mcgill hover:bg-mcgill-light transition-colors"
+          className="mt-6 inline-block px-6 py-2.5 rounded-lg font-semibold bg-accent hover:bg-accent-light transition-colors"
         >
           Go to Sign In
         </a>
@@ -62,7 +62,7 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-mcgill focus:ring-1 focus:ring-mcgill outline-none text-sm transition-colors"
+            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-accent focus:ring-1 focus:ring-accent outline-none text-sm transition-colors"
             placeholder="you@example.com"
           />
         </div>
@@ -74,7 +74,7 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-mcgill focus:ring-1 focus:ring-mcgill outline-none text-sm transition-colors"
+            className="w-full px-4 py-2.5 rounded-lg bg-surface border border-border focus:border-accent focus:ring-1 focus:ring-accent outline-none text-sm transition-colors"
             placeholder="At least 6 characters"
           />
         </div>
@@ -88,7 +88,7 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 rounded-lg font-semibold bg-mcgill hover:bg-mcgill-light disabled:opacity-40 transition-colors"
+          className="w-full py-2.5 rounded-lg font-semibold bg-accent hover:bg-accent-light disabled:opacity-40 transition-colors"
         >
           {loading ? "Creating account..." : "Sign Up"}
         </button>
@@ -96,7 +96,7 @@ export default function SignupPage() {
 
       <p className="mt-6 text-sm text-muted text-center">
         Already have an account?{" "}
-        <a href="/login" className="text-mcgill hover:underline">
+        <a href="/login" className="text-accent hover:underline">
           Sign in
         </a>
       </p>
