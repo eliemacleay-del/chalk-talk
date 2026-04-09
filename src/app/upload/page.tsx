@@ -99,6 +99,7 @@ export default function UploadPage() {
           Upload File
           <input
             type="file"
+            accept=".pdf,.txt,application/pdf,text/plain"
             onChange={handleFile}
             className="hidden"
           />
