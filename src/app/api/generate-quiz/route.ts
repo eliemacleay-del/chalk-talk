@@ -4,41 +4,12 @@ import { getFootballPrompt } from "@/lib/football-prompt";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-async function extractTextFromFile(file: File): Promise<string> {
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require("pdf-parse/lib/pdf-parse.js");
-    const result = await pdfParse(buffer);
-    return result.text;
-  }
-
-  return buffer.toString("utf-8");
-}
-
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const notes = (formData.get("notes") as string) || "";
-  const file = formData.get("file") as File | null;
   const difficulty = (formData.get("difficulty") as string) || "medium";
 
-  let content = notes;
-
-  if (file && file.size > 0) {
-    try {
-      const fileText = await extractTextFromFile(file);
-      content = content ? `${content}\n\n${fileText}` : fileText;
-    } catch (e) {
-      console.error("File extraction error:", e);
-      return NextResponse.json(
-        { error: "Could not read that file. Try pasting the text instead." },
-        { status: 400 }
-      );
-    }
-  }
-
-  if (!content || content.trim().length < 10) {
+  if (!notes || notes.trim().length < 10) {
     return NextResponse.json(
       { error: "Please provide at least a few sentences of notes." },
       { status: 400 }
@@ -54,7 +25,7 @@ export async function POST(req: NextRequest) {
       model: "llama-3.1-8b-instant",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `NOTES:\n${content}` },
+        { role: "user", content: `NOTES:\n${notes}` },
       ],
       temperature: 0.5,
       top_p: 0.9,
@@ -73,12 +44,10 @@ export async function POST(req: NextRequest) {
     const questions = JSON.parse(jsonMatch[0]).map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (q: any) => {
-        // Sanitize diagram data
         if (q.diagram && (!q.diagram.players || !Array.isArray(q.diagram.players) || q.diagram.players.length === 0)) {
           q.diagram = null;
         }
         if (q.diagram) {
-          // Clamp all coordinates to 0-100
           q.diagram.players = q.diagram.players.map(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (p: any) => ({

@@ -4,20 +4,56 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { StarRating } from "@/components/StarRating";
 
+async function extractPdfText(file: File): Promise<string> {
+  const pdfjsLib = await import("pdfjs-dist");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/build/pdf.worker.min.mjs",
+    import.meta.url
+  ).toString();
+
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+
+  const pages: string[] = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const text = content.items
+      .map((item) => ("str" in item ? item.str : ""))
+      .join(" ");
+    pages.push(text);
+  }
+
+  return pages.join("\n").trim();
+}
+
 export default function UploadPage() {
   const router = useRouter();
   const [notes, setNotes] = useState("");
-  const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
   const [loading, setLoading] = useState(false);
+  const [extractingPdf, setExtractingPdf] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
-    setFile(f);
     setFileName(f.name);
+    setError(null);
+
+    if (f.type === "application/pdf" || f.name.endsWith(".pdf")) {
+      setExtractingPdf(true);
+      try {
+        const text = await extractPdfText(f);
+        setNotes(text);
+      } catch {
+        setError("Could not read that PDF. Try pasting the text instead.");
+      } finally {
+        setExtractingPdf(false);
+      }
+      return;
+    }
 
     if (f.type === "text/plain" || f.name.endsWith(".txt")) {
       const reader = new FileReader();
@@ -36,9 +72,6 @@ export default function UploadPage() {
       const formData = new FormData();
       formData.append("notes", notes);
       formData.append("difficulty", difficulty);
-      if (file) {
-        formData.append("file", file);
-      }
 
       const res = await fetch("/api/generate-quiz", {
         method: "POST",
@@ -108,7 +141,7 @@ export default function UploadPage() {
         </label>
         {fileName && (
           <span className="text-xs font-mono text-muted truncate max-w-xs">
-            {fileName}
+            {extractingPdf ? "Reading..." : fileName}
           </span>
         )}
       </div>
@@ -131,10 +164,15 @@ export default function UploadPage() {
       {/* Generate button */}
       <button
         onClick={handleGenerate}
-        disabled={(!notes.trim() && !file) || loading}
+        disabled={!notes.trim() || loading || extractingPdf}
         className="mt-12 w-full h-14 bg-ink text-bg hover:bg-ink/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3"
       >
-        {loading ? (
+        {extractingPdf ? (
+          <>
+            <span className="w-2 h-2 bg-bg animate-pulse" />
+            <span className="display-up text-lg">Reading PDF</span>
+          </>
+        ) : loading ? (
           <>
             <span className="w-2 h-2 bg-bg animate-pulse" />
             <span className="display-up text-lg">Generating Reps</span>
